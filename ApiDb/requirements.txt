@@ -1,0 +1,8 @@
+fastapi
+prometheus_client 
+psutil
+uvicorn
+psycopg2
+sentence_transformers 
+pgvector
+

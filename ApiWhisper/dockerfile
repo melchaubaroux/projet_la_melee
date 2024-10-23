@@ -1,0 +1,23 @@
+# Utilisez une image officielle Python comme base
+FROM python:3.8-slim
+
+RUN apt-get update && apt-get install -y ffmpeg #git
+
+# Copiez le reste des fichiers de l'application dans le répertoire de travail
+COPY . .
+
+#recupere les modeles mis en cache
+#COPY ~/.cache/whisper ~/.cache/whisper 
+
+# Copiez le fichier des dépendances dans le répertoire de travail
+COPY requirements.txt .
+
+# Installez les dépendances de l'application
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Téléchargement du modèle d'IA Whisper
+#RUN pip install "git+https://github.com/openai/whisper.git"
+
+EXPOSE 8000
+# Commande pour démarrer l'application
+CMD ["python", "whisperApi.py"]

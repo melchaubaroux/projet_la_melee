@@ -1,0 +1,42 @@
+# route:
+#   receiver: 'slack'
+
+# receivers:
+#   - name: 'slack'
+# #       slack_configs:
+# #           - send_resolved: true
+# #             username: '<username>'
+# #             channel: '#<channel-name>'
+# #             api_url: '<incomming-webhook-url>'
+
+
+global:
+  smtp_smarthost: 'smtp.gmail.com:465'  # Serveur SMTP, ici avec le port 465 (TLS)
+  smtp_from: 'mel.chaubaroux@gmail.com'   # Adresse email de l'expéditeur
+  smtp_auth_username: 'mel.chaubaroux@gmail.com'  # Nom d'utilisateur pour l'authentification SMTP
+  smtp_auth_password: 'ntmk elyy glfo ueuf'     # Mot de passe SMTP
+  smtp_require_tls: False   # Utilise TLS pour sécuriser la connexion SMTP (vrai si le serveur supporte TLS)
+
+route:
+  group_by: ['alertname']  # Groupe les alertes par nom
+  group_wait: 30s  # Temps d'attente pour grouper les alertes avant de les envoyer
+  group_interval: 5m  # Envoi d'une nouvelle notification après un délai de 5 minutes si l'alerte persiste
+  repeat_interval: 1h  # Si l'alerte persiste, envoie un rappel après 1 heure
+  receiver: 'email-alerts'
+
+  
+  routes:
+    - match:
+        alertname: ServiceDown  # Cette section s'applique aux alertes "ServiceDown"
+      receiver: 'email-alerts'  # Envoie les alertes à l'email
+
+
+
+receivers:
+  - name: 'email-alerts'
+    email_configs:
+      - to: 'mel.chaubaroux@gmail.com'  # Adresse email du destinataire
+        send_resolved: true            # Envoi d'un mail lorsque l'alerte est résolue
+
+
+
