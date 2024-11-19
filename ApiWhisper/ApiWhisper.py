@@ -10,7 +10,7 @@ from transcription_fonction_ressource import *
 
 from send_email import send_email
 
-model = whisper.load_model("large") 
+model = whisper.load_model("tiny") 
 
 app = FastAPI()
 

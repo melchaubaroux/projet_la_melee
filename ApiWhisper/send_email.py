@@ -1,9 +1,13 @@
+
+
 import smtplib,ssl
 from email.mime.text import MIMEText
 
+from param import API_KEY
+
 # Remplacez ces valeurs par celles de votre compte
 GMAIL_USERNAME = "mel.chaubaroux@gmail.com"
-GMAIL_APP_PASSWORD = "cle api"
+GMAIL_APP_PASSWORD = API_KEY
 
 def send_email(subject, body, sender, recipients):
     msg = MIMEText(body)
