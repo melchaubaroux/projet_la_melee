@@ -336,4 +336,8 @@ def extract_document_informations(documents_identifier:list,vectorised_query):
     return data 
 
 
+if __name__=="__main__" : 
+    # appel des fontions de test 
+    print("lancement des tests")
+
 
