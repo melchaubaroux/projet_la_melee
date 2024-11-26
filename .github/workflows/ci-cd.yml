@@ -24,7 +24,7 @@ jobs:
     - name: install dependancy
       run: |
           pip install pytest
-          pip install testmon
+          pip install pytest-testmon
    
 
     # Étape 3 : Exécuter les tests
