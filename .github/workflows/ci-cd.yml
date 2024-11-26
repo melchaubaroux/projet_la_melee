@@ -14,14 +14,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-
-
-    # Étape 2 : installation des dependances 
-    - name: install testing dependancies
+    # Étape 2 : Installer les dépendances globales pour les tests
+    - name: Install testing dependencies
       run: |
-          pip install pytest pytest-testmon
+        pip install pytest pytest-testmon
 
-     name: Install dependencies for service 1
+    # Étape 3 : Installer les dépendances pour chaque service
+    - name: Install dependencies for service 1
       run: |
         pip install -r ApiDb/requirements.txt
 
@@ -32,12 +31,11 @@ jobs:
     - name: Install dependencies for service 3
       run: |
         pip install -r ApiChatbot/requirements.txt
-   
 
-    # Étape 3 : Exécuter les tests
+    # Étape 4 : Exécuter les tests
     - name: Run tests
-      run:  pytest --testmon 
-      
+      run: |
+        pytest --testmon  # Exécute les tests avec pytest-testmon
 
 # jobs:
 #   detect-changes:
