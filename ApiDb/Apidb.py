@@ -145,18 +145,22 @@ def upload(file:UploadFile=File(...)):
 
 @app.post("/document deletion")
 def document_deletion(table) :
+    try:
+        # suppression de la  references dans la table de references 
+        conn,cur=connection_db()
+        cur.execute(f"""DELETE FROM index WHERE value = '{table}'; """)
+        save_and_stop_connection(conn,cur) 
 
-    # suppression de la  references dans la table de references 
-    conn,cur=connection_db()
-    cur.execute(f"""DELETE FROM index WHERE value = '{table}'; """)
-    save_and_stop_connection(conn,cur) 
+        # suppression de la table lié a la reference precedement supprimé
+        conn,cur=connection_db()
+        conn.autocommit =True 
+        cur.execute(f"""DROP TABLE {table}; """)
+        
+        save_and_stop_connection(conn,cur) 
+        return "no more table at this name"
+    except Exception as e  :
+        return "la table n'existe pas" 
 
-    # suppression de la table lié a la reference precedement supprimé
-    conn,cur=connection_db()
-    conn.autocommit =True 
-    cur.execute(f"""DROP TABLE {table}; """)
-    
-    save_and_stop_connection(conn,cur) 
     
 
 #mis a jour de fichiers 
@@ -177,5 +181,5 @@ def vectorial_research (query:str,number_of_document:int=1) :
 
 
 if __name__ == '__main__':
-    uvicorn.run(app,host="127.0.0.1" , port=8001)
+    uvicorn.run(app,host="0.0.0.0" , port=8001)
 

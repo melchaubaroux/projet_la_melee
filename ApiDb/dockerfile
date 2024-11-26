@@ -1,51 +1,54 @@
-FROM postgres:latest
+# Utilisez une image officielle Python comme base
+FROM python:3.8-slim
 
-# Mettre à jour les dépendances
+
 # RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     git \
-#     postgresql-server-dev-all \
+#     ca-certificates \
+#     curl \
+#     gnupg \
+#     && curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | tee /etc/apt/trusted.gpg.d/pgdg.asc \
+#     && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -c | awk '{print $2}')-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+#     && apt-get update \
+#     && apt-get install -y postgresql-14 postgresql-client-14 git \
 #     && rm -rf /var/lib/apt/lists/*
 
-# # Cloner le dépôt pgvector
+WORKDIR /app
 WORKDIR /tmp
-# RUN git clone https://github.com/pgvector/pgvector.git
 
-# Compiler et installer pgvector
-# WORKDIR /tmp/pgvector
-# RUN make clean && \
-#     make OPTFLAGS="" && \
-#     make install && \
-#     mkdir /usr/share/doc/pgvector && \
-#     cp LICENSE README.md /usr/share/doc/pgvector && \
-#     rm -rf /tmp/pgvector
+RUN cd /app
 
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
+    postgresql \
+    postgresql-contrib \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-
+# Cloner le dépôt pgvector
 RUN cd /tmp \
     git clone --branch v0.7.4 https://github.com/pgvector/pgvector.git  \
     cd pgvector  \
     make  \
-    make install # may need sudo  
+    make install # may need sudo  \
+    rm -rf /tmp/pgvector \
+    cd ..
 
-# Copiez le fichier des dépendances dans le répertoire de travail
-COPY requirements.txt .
+WORKDIR /app
+
+RUN cd /app
+
+# Copiez le reste des fichiers de l'application dans le répertoire de travail
+COPY . .
+
+RUN ls
 
 # Installez les dépendances de l'application
-RUN python3-pip install  requirements.txt
-
-# Créer l'extension vector
-# RUN echo "CREATE EXTENSION IF NOT EXISTS vector;" | psql -U postgres -d postgres
+RUN pip install  -r requirements.txt 
+#--no-cache-dir
 
 
-# Exposer la port 5432
-EXPOSE 5432
+# Exposer la port 8001
+EXPOSE 8001
 
+# lancement de l'api 
 CMD ["python", "Apidb.py"]
-
-
 

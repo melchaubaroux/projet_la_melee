@@ -66,21 +66,23 @@ def drop_table (table,cursor):
         print("fail to drop: ",e)
 
 @check_execution
-def table_existance (table) :
+def table_existance (searched_table) :
 
-    conn,cur=connection_db(table)
-    cur.execute(f" SELECT column_name FROM information_schema.columns WHERE table_name = '{table}';")
+    conn,cur=connection_db()
+    cur.execute(f" SELECT column_name FROM information_schema.columns WHERE table_name = '{searched_table}';")
     table = cur.fetchone()
 
-    if len(table)>0 : 
-        return "true"
-    else : 
+    try: 
+        if len(table)>0 : return "true"
+        else : return "false"
+        
+    except : 
         return "false"
             
 @check_execution
 def check_consistancy (table):
 
-    conn,cur=connection_db(table)
+    conn,cur=connection_db()
     
     try : 
         if table_existance(table)=="true":
@@ -267,7 +269,7 @@ def document_vectorisation (file):
         cur.execute(f"INSERT INTO index (embedding,value) VALUES  (%s,%s)",(embeddings,document_name))
 
         # vectorisation par partie de document 
-        splited_document = document.split('. ')
+        splited_document = document.split('.')
 
         # creation table 
         cur.execute(f"CREATE TABLE {document_name} (id SERIAL PRIMARY KEY,embedding VECTOR(384),value VARCHAR);")

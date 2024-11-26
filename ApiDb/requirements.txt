@@ -2,7 +2,8 @@ fastapi
 prometheus_client 
 psutil
 uvicorn
-psycopg2
+psycopg2-binary
 sentence_transformers 
 pgvector
+python-multipart
 

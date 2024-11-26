@@ -38,18 +38,19 @@ def split_audio_by_silence(input_file, silence_threshold=-50, min_silence_durati
 
     # creation du repertoire qui acceuillera les morceaux découper sur les silences
 
+    directory_name=input_file[:-4]
+
     os.makedirs(input_file[:-4],exist_ok=True)
 
     for i, segment in enumerate(segments, start=1):
 
         output_file = f"chunk_{i}.mp3"
-        segment.export(input_file[:-4]+"/"+output_file, format="mp3")
+        segment.export(directory_name+"/"+output_file, format="mp3")
 
         # Print the start and end time of each chunk
-        chunk_start_time = (segment[i].frame_count() / segment.frame_rate) * 1000
-        chunk_end_time = (segment[i+1].frame_count() / segment.frame_rate) * 1000
-        print(f"Segment {i}: {chunk_start_time}ms to {chunk_end_time}ms")
-
+        chunk_start_time = (i - 1) * len(segment)
+        chunk_end_time = i * len(segment)
+        print(f"{output_file}: {chunk_start_time}ms to {chunk_end_time}ms duration = {len(segment)}ms")
 
 def transcription (audio,model):
         

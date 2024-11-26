@@ -1,14 +1,17 @@
+import os 
+import uvicorn
+# import ssl 
+
 from fastapi.middleware.cors import CORSMiddleware
 # from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi import FastAPI, UploadFile, File
-import uvicorn
+
 import whisper
-import os 
-# import ssl 
 
+from param import API_KEY, EMAIL , SERVER
 from transcription_fonction_ressource import *
-
 from send_email import send_email
+
 
 model = whisper.load_model("tiny") 
 
@@ -33,7 +36,7 @@ app.add_middleware(
 
 
 @app.post("/transcription")
-def speech_to_text( file:UploadFile=File(...),sender="mel.chaubaroux@gmail.com", recipients="mel.chaubaroux@gmail.com"):
+def speech_to_text( file:UploadFile=File(...),sender=EMAIL, recipients=EMAIL,smtp_server=SERVER):
 
     texte = ""
 
@@ -87,8 +90,8 @@ def speech_to_text( file:UploadFile=File(...),sender="mel.chaubaroux@gmail.com",
 
         print(f"segment {indice+1}/{number_of_segment} transcript")
 
-    os.remove(file.filename)
-    send_email(subject, texte, sender, recipients)
+    # os.remove(file.filename)
+    send_email(subject, texte, sender, recipients,smtp_server)
 
 
     return texte
