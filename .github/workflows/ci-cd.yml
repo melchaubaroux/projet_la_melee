@@ -22,7 +22,9 @@ jobs:
     # Étape 2 : installation des dependances 
         # Étape 3 : Exécuter les tests
     - name: install dependancy
-      run: pip install pytest
+      run: |
+          pip install pytest
+          pip install testmon
    
 
     # Étape 3 : Exécuter les tests

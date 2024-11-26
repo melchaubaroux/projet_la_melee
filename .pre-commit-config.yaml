@@ -3,6 +3,6 @@ repos:
     hooks:
       - id: pytest
         name: Run pytest before push
-        entry: pytest
+        entry: pytest --testmon
         language: system
         types: [python]
