@@ -14,17 +14,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # - name: Display files
-    #   run: |
-    #     echo "Listing files in the repository:"
-    #     ls -la  # Liste les fichiers pour vérifier que le code est bien récupéré
+
 
     # Étape 2 : installation des dependances 
-        # Étape 3 : Exécuter les tests
-    - name: install dependancy
+    - name: install testing dependancies
       run: |
-          pip install pytest
-          pip install pytest-testmon
+          pip install pytest pytest-testmon
+
+     name: Install dependencies for service 1
+      run: |
+        pip install -r ApiDb/requirements.txt
+
+    - name: Install dependencies for service 2
+      run: |
+        pip install -r ApiWhisper/requirements.txt
+
+    - name: Install dependencies for service 3
+      run: |
+        pip install -r ApiChatbot/requirements.txt
    
 
     # Étape 3 : Exécuter les tests
