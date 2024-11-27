@@ -21,26 +21,22 @@ jobs:
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^ApiDb/'; then
             echo "ApiDb changed."
-            echo "changed=true" >> $GITHUB_ENV
+            echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "ApiDb not changed."
-            echo "changed=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
-        outputs:
-          changed: ${{ env.changed }}
 
       - name: Detect changes for ApiWhisper
         id: ApiWhisper
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^ApiWhisper/'; then
             echo "ApiWhisper changed."
-            echo "changed=true" >> $GITHUB_ENV
+            echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "ApiWhisper not changed."
-            echo "changed=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
-        outputs:
-          changed: ${{ env.changed }}
 
   test-ApiDb:
     needs: detect-changes
