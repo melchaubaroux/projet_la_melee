@@ -42,9 +42,26 @@ jobs:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.ApiDb_changed == 'true' }}
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Plasma2020@
+          POSTGRES_DB: suppliers  # ou ton nom de base de données spécifique
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready -U postgres" --health-timeout=30s --health-retries=5 --health-start-period=30s
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+
+      
+
+
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -69,6 +86,14 @@ jobs:
           pip install -r ApiDb/requirements.txt
 
       - name: Run tests for ApiDb
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Plasma2020@
+          POSTGRES_DB: suppliers
+          POSTGRES_OPTIONS: "-c search_path=public"
+          
         run: pytest --testmon ApiDb
 
   test-ApiWhisper:
