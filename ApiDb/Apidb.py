@@ -50,7 +50,7 @@ if table_existance("index")=='false':
 
 # check connection
 @app.get("/available_connection", response_class=HTMLResponse)#JSONResponse
-def test_connection():
+def check_connection():
     
     conn,cur=connection_db()
 
@@ -82,7 +82,7 @@ def monitoring () :
 
 # check login connection 
 @app.get("/verification_of_authorisation", response_class=HTMLResponse)
-def test_credentials (username,password) : 
+def check_credentials (username,password) : 
     conn,cur=connection_db()
     return verification_of_authorisation(cur,'identifieur_client',username,password)
 
