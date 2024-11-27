@@ -1,0 +1,252 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ApiDb_changed: ${{ steps.ApiDb.outputs.changed }}
+      ApiWhisper_changed: ${{ steps.ApiWhisper.outputs.changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: Detect changes for ApiDb
+        id: ApiDb
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^ApiDb/'; then
+            echo "ApiDb changed."
+            echo "changed=true" >> $GITHUB_ENV
+          else
+            echo "ApiDb not changed."
+            echo "changed=false" >> $GITHUB_ENV
+        outputs:
+          changed: ${{ env.changed }}
+
+      - name: Detect changes for ApiWhisper
+        id: ApiWhisper
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^ApiWhisper/'; then
+            echo "ApiWhisper changed."
+            echo "changed=true" >> $GITHUB_ENV
+          else
+            echo "ApiWhisper not changed."
+            echo "changed=false" >> $GITHUB_ENV
+        outputs:
+          changed: ${{ env.changed }}
+
+  test-ApiDb:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.ApiDb_changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Cache pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+    
+    - name: Install testing dependencies
+      run: |
+        pip install pytest pytest-testmon
+
+
+      - name: Install dependencies for ApiDb
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ApiDb/requirements.txt
+
+      - name: Run tests for ApiDb
+        run: pytest --testmon ApiDb
+
+  test-ApiWhisper:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.ApiWhisper_changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Cache pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('ApiWhisper/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+
+      - name: Install dependencies for ApiWhisper
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ApiWhisper/requirements.txt
+
+      - name: Run tests for ApiWhisper
+        run: pytest --testmon ApiWhisper
+
+
+
+
+
+
+
+
+
+
+
+
+############## test 
+
+
+# name: CI/CD Workflow
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest  # L'environnement d'exécution
+
+#     steps:
+#     # Étape 1 : Vérifier le code source
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+
+#        # Set up Python
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: '3.11'
+
+#     # Cache pip dependencies
+#     - name: Cache pip dependencies
+#       uses: actions/cache@v3
+#       with:
+#         path: ~/.cache/pip
+#         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#         restore-keys: |
+#           ${{ runner.os }}-pip-
+
+
+#     # Étape 2 : Installer les dépendances globales pour les tests
+#     - name: Install testing dependencies
+#       run: |
+#         pip install pytest pytest-testmon
+
+#     # Étape 3 : Installer les dépendances pour chaque service
+#     - name: Install dependencies for service 1
+#       run: |
+#         pip install -r ApiDb/requirements.txt
+
+#     - name: Install dependencies for service 2
+#       run: |
+#         pip install -r ApiWhisper/requirements.txt
+
+#     # - name: Install dependencies for service 3
+#     #   run: |
+#     #     pip install -r ApiChatbot/requirements.txt
+
+#     # Étape 4 : Exécuter les tests
+#     - name: Run tests
+#       run: |
+#         pytest --testmon  # Exécute les tests avec pytest-testmon
+
+
+
+
+
+###################### build 
+
+
+
+
+
+# jobs:
+#   detect-changes:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       changed_files: ${{ steps.changed_files.outputs.files }}
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+      
+#       - name: Detect changed files
+#         id: changed_files
+#         run: |
+#           files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+#           echo "::set-output name=files::$files"
+
+#   run-tests:
+#     needs: detect-changes
+#     if: ${{ steps.changed_files.outputs.files }}
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Run tests
+#         run: |
+#           pytest --testmon
+#           # Exécuter des tests uniquement pour les fichiers/services modifiés
+#           echo "Running tests for changed services"
+#           # Implémentation spécifique selon vos tests
+
+#   build-docker-images:
+#     needs: detect-changes
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Login to DockerHub
+#         uses: docker/login-action@v2
+#         with:
+#           username: ${{ secrets.USERNAME }}
+#           password: ${{ secrets.PASSWORD }}
+
+#       - name: Build and push Docker images
+#         run: |
+#           for service in $(echo "${{ steps.changed_files.outputs.files }}" | grep "Dockerfile" | cut -d '/' -f1 | uniq); do
+#             docker build -t myrepo/$service:latest $service
+#             docker push myrepo/$service:latest
+#           done
+
+#   deploy-stack:
+#     needs: build-docker-images
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Deploy to Docker Swarm
+#         run: |
+#           docker stack deploy -c docker-compose.yml mystack
